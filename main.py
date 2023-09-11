@@ -18,9 +18,19 @@ class Automate:
             tmp = "    ".join([f"q{k}" if k != "-" else "- " for k in self.states[i]])
             print(f'q{i}\t{tmp}')
 
+    def is_valid(self, word):
+        pass
 
-KDA = Automate("input.txt")
-KDA.print_table()
+    def read_word(self, word):
+        for ch in word:
+            pass
+
+
+if __name__ == "__main__":
+    KDA = Automate("input.txt")
+    KDA.print_table()
+    KDA.read_word()
+
 
 
 
