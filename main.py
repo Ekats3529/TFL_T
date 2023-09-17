@@ -1,6 +1,8 @@
-class Automate:
+class KDAAutomate:
     states = {}
     symbols = {}
+    beg_state = None
+    end_state = None
     auto_type = ""
 
     def __init__(self, filename):
@@ -10,15 +12,24 @@ class Automate:
             for ch in symbols.split():
                 self.symbols[ch] = k
                 k += 1
+            self.beg_state, self.end_state = map(int, file.readline().split())
             states = file.readlines()
             for k in range(len(states)):
                 self.states[k] = states[k].split()
 
     def print_table(self):
-        print("\t", end="")
-        chars = "\t".join(self.symbols.keys())
+        print("\t\t", end="")
+        chars = "     ".join(self.symbols.keys())
         print(chars)
         for i in range(len(self.states)):
+            if i == self.beg_state:
+                print("->", end="")
+            else:
+                print("  ", end="")
+            if i == self.end_state:
+                print("* ", end="")
+            else:
+                print("  ", end="")
             tmp = "    ".join([f"q{k}" if k != "-" else "- " for k in self.states[i]])
             print(f'q{i}\t{tmp}')
 
@@ -36,17 +47,16 @@ class Automate:
                 cur_state = int(new_state)
             else:
                 print(f"The end state q{cur_state}")
-                print(f"The {word} not in language")
+                print(f"The {word} NOT in language")
                 return
         print(f"The {word} in language")
 
 
 if __name__ == "__main__":
-    KDA = Automate("input.txt")
+    KDA = KDAAutomate("input.txt")
     KDA.print_table()
     print()
-    KDA.read_word("bac")
-
+    KDA.read_word("ab")
 
 
 
