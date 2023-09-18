@@ -1,4 +1,4 @@
-class KDAAutomate:
+class KDAutomate:
     states = {}
     symbols = {}
     beg_state = None
@@ -39,7 +39,7 @@ class KDAAutomate:
         for ch in word:
             if ch not in self.symbols.keys():
                 print(f"Unexpected symbol {ch}")
-                print(f"The {word} not in language")
+                print(f"The {word} NOT in language")
                 return
             new_state = self.states[cur_state][self.symbols[ch]]
             if new_state != '-':
@@ -49,14 +49,14 @@ class KDAAutomate:
                 print(f"The end state q{cur_state}")
                 print(f"The {word} NOT in language")
                 return
-        print(f"The {word} in language")
+        if cur_state == self.end_state:
+            print(f"The {word} in language")
+            return
+        print(f"The {word} NOT in language")
 
 
 if __name__ == "__main__":
-    KDA = KDAAutomate("input.txt")
+    KDA = KDAutomate("input.txt")
     KDA.print_table()
     print()
-    KDA.read_word("ab")
-
-
-
+    KDA.read_word("ababbbaa")
