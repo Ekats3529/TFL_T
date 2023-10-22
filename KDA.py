@@ -1,5 +1,4 @@
 class KDAutomate:
-
     states = {}
     symbols = {}
     state_names = {}
@@ -31,6 +30,10 @@ class KDAutomate:
     def set_states(self, states):
         self.states = states
 
+    def set_names(self, names):
+        for k in range(len(names)):
+            self.state_names[k] = names[k]
+
     def set_end_state(self, end_state):
         self.end_state = end_state
 
@@ -44,7 +47,7 @@ class KDAutomate:
         print("\t  ", end="")
         chars = "".join([f"{ch: >8}" for ch in self.symbols.keys()])
         print(chars)
-        for i in range(len(self.states)):
+        for i in range(len(self.state_names)):
             if self.state_names[i] == self.beg_state:
                 print("->", end="")
             else:

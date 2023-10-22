@@ -23,7 +23,7 @@ def NKA_to_KDA(nka, kda):
         for ch in nka.symbols:
             new_state = set()
             for state in cur_state:
-                for st in nka.states[state][nka.symbols[ch]]:
+                for st in nka.states[int(state)][nka.symbols[ch]]:
                     new_state.add(st)
 
             if "-" in new_state and len(new_state) > 1:
@@ -55,6 +55,7 @@ def NKA_to_KDA(nka, kda):
     kda.set_states(kda_states)
     kda.set_end_state(new_ends)
     kda.set_symbols(nka.symbols)
+    kda.set_names(list(new_names.keys()))
 
 
 nka = NKAutomate("input_NKA.txt")

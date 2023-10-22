@@ -60,7 +60,7 @@ class NKAutomate:
                 return
             new_state = set()
             for st in cur_state:
-                tmp = set(self.states[st][self.symbols[ch]])
+                tmp = set(self.states[int(st)][self.symbols[ch]])
                 new_state = new_state.union(tmp)
             new_state.discard("-")
             if len(new_state) == 0:
@@ -81,4 +81,5 @@ class NKAutomate:
 if __name__ == "__main__":
     KDA = NKAutomate("input_NKA.txt")
     KDA.print_table()
+    KDA.read_word("aaaabbbbaacc")
 

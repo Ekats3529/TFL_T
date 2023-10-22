@@ -60,7 +60,7 @@ class EpsNKAutomate:
                 return
             new_state = set()
             for st in cur_state:
-                tmp = set(self.states[st][self.symbols[ch]])
+                tmp = set(self.states[int(st)][self.symbols[ch]])
                 new_state = new_state.union(tmp)
             new_state.discard("-")
             if len(new_state) == 0:
