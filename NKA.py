@@ -59,6 +59,7 @@ class NKAutomate:
                 print(f"The {word} NOT in language")
                 return
 
+
             print(f"q{cur_state} --- {ch} ---> q{new_state}")
             cur_state = new_state
 

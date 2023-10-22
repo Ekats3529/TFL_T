@@ -1,4 +1,5 @@
 class KDAutomate:
+
     states = {}
     symbols = {}
     beg_state = None
