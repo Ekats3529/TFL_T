@@ -1,3 +1,6 @@
+from NKA import NKAutomate
+
+
 class e_NKAutomate:
     states = {}
     symbols = {}
