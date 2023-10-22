@@ -2,16 +2,25 @@ class KDAutomate:
 
     states = {}
     symbols = {}
+    state_names = {}
     beg_state = None
     end_state = None
 
     def __init__(self, filename):
         with open(filename) as file:
+            # read symbols of language
             symbols = file.readline()
             k = 0
             for ch in symbols.split():
                 self.symbols[ch] = k
                 k += 1
+
+            # read names of states
+            names = file.readline().split()
+            for k in range(len(names)):
+                self.state_names[k] = names[k]
+
+            # read transitions
             tmp = file.readline().split()
             self.beg_state = tmp[0]
             self.end_state = tmp[1].split("|")
@@ -36,16 +45,16 @@ class KDAutomate:
         chars = "".join([f"{ch: >8}" for ch in self.symbols.keys()])
         print(chars)
         for i in range(len(self.states)):
-            if str(i) == self.beg_state:
+            if self.state_names[i] == self.beg_state:
                 print("->", end="")
             else:
                 print("  ", end="")
-            if str(i) in self.end_state:
+            if self.state_names[i] in self.end_state:
                 print("* ", end="")
             else:
                 print("  ", end="")
             tmp = "    ".join([f"q{k: <3}" if k != "-" else "- " for k in self.states[i]])
-            print(f'q{i: <5}\t{tmp}')
+            print(f'q{self.state_names[i]: <5}\t{tmp}')
 
     def read_word(self, word):
         print(f"The word: {word}")

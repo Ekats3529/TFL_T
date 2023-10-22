@@ -42,7 +42,6 @@ def NKA_to_KDA(nka, kda):
                 list(new_names.values()).index(key_state))
             q.put(key_state)
 
-
     new_ends = []
 
     for state in new_names.keys():
@@ -64,4 +63,3 @@ nka.print_table()
 NKA_to_KDA(nka, kda)
 kda.print_table()
 kda.read_word("ababbbcc")
-

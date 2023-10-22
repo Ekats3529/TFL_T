@@ -1,23 +1,32 @@
 class NKAutomate:
     states = {}
     symbols = {}
+    state_names = {}
     beg_state = None
     end_state = None
     auto_type = ""
 
     def __init__(self, filename):
         with open(filename) as file:
+            # read symbols of language
             symbols = file.readline()
             k = 0
             for ch in symbols.split():
                 self.symbols[ch] = k
                 k += 1
+
+            # read names of states
+            names = file.readline().split()
+            for k in range(len(names)):
+                self.state_names[k] = names[k]
+
+            # read transitions
             tmp = file.readline().split()
             self.beg_state = tmp[0]
             self.end_state = tmp[1].split("|")
             states = file.readlines()
             for k in range(len(states)):
-                self.states[str(k)] = [state.split("|") for state in states[k].split()]
+                self.states[k] = [state.split("|") for state in states[k].split()]
 
     def print_table(self):
         print("\t\t", end="")
@@ -25,21 +34,21 @@ class NKAutomate:
         chars = sp.join(self.symbols.keys())
         print(chars)
         for i in range(len(self.states)):
-            if str(i) in self.beg_state:
+            if self.state_names[i] in self.beg_state:
                 print("->", end="")
             else:
                 print("  ", end="")
-            if str(i) in self.end_state:
+            if self.state_names[i] in self.end_state:
                 print("* ", end="")
             else:
                 print("  ", end="")
             tmp = ""
-            for lst in self.states[str(i)]:
+            for lst in self.states[i]:
                 if "-" in lst:
                     tmp += f"{'-' : <10}"
                 else:
                     tmp += f'{"|".join([f"q{k}" for k in lst]): <10}'
-            print(f'q{i}\t{tmp}')
+            print(f'q{self.state_names[i]}\t{tmp}')
 
     def read_word(self, word):
         print(f"The word: {word}")
@@ -72,5 +81,4 @@ class NKAutomate:
 if __name__ == "__main__":
     KDA = NKAutomate("input_NKA.txt")
     KDA.print_table()
-    print()
-    KDA.read_word("ababbbcc")
+
