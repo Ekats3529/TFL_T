@@ -4,7 +4,22 @@ class NKAutomate:
     state_names = {}
     beg_state = None
     end_state = None
-    auto_type = ""
+
+    def set_states(self, states):
+        self.states = states
+
+    def set_names(self, names):
+        for k in range(len(names)):
+            self.state_names[k] = names[k]
+
+    def set_end_state(self, end_state):
+        self.end_state = end_state
+
+    def set_beg_state(self, beg_state):
+        self.beg_state = beg_state
+
+    def set_symbols(self, symbols):
+        self.symbols = symbols
 
     def __init__(self, filename):
         with open(filename) as file:
@@ -52,7 +67,7 @@ class NKAutomate:
 
     def read_word(self, word):
         print(f"The word: {word}")
-        cur_state = set('0')
+        cur_state = set(self.beg_state)
         for ch in word:
             if ch not in self.symbols.keys():
                 print(f"Unexpected symbol {ch}")
@@ -60,7 +75,8 @@ class NKAutomate:
                 return
             new_state = set()
             for st in cur_state:
-                tmp = set(self.states[int(st)][self.symbols[ch]])
+                ind = list(self.state_names.values()).index(st)
+                tmp = set(self.states[ind][self.symbols[ch]])
                 new_state = new_state.union(tmp)
             new_state.discard("-")
             if len(new_state) == 0:
@@ -81,5 +97,4 @@ class NKAutomate:
 if __name__ == "__main__":
     KDA = NKAutomate("input_NKA.txt")
     KDA.print_table()
-    KDA.read_word("aaaabbbbaacc")
-
+    KDA.read_word("aaaabbbbaac")

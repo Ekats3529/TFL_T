@@ -1,0 +1,9 @@
+0 1 e
+A B C D E F
+A D
+E B F
+- C -
+- D -
+- - -
+F - B|C
+D - -
