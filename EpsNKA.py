@@ -6,7 +6,6 @@ class EpsNKAutomate:
     end_state = None
     closure = {}
 
-
     def clear_all(self):
         self.states.clear()
         self.symbols.clear()
@@ -130,5 +129,5 @@ if __name__ == "__main__":
     nka.print_table()
     nka.print_closure()
     print("----------------------------------")
-    nka.read_word("000")
+    nka.read_word("")
 
