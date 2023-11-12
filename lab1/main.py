@@ -238,7 +238,7 @@ def lex_analysis(text):
                     cur_state = states.E
                     add = False
 
-            elif cur_state == states.E:
+            if cur_state == states.E:
                 return False
 
             if add:
@@ -258,6 +258,7 @@ def lex_analysis(text):
             if cur_state != states.E and cur_state != states.F:
                 lexm += string[i]
                 i += 1
+
     if type_expr == 0 or list_lex[-1].type not in [lex.var, lex.const]:
         return False
 
