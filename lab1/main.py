@@ -5,7 +5,22 @@ states = Enum('states', ["S", 'Ai', 'Ac', 'As', 'Bs', "Cs",
 
 lex = Enum('lex', ["do", 'loop', 'until',
                    'lNot', 'lAnd', 'lOr', 'output',
-                   'rel', 'lAs', 'ao', 'var', 'const'])
+                   'rel', 'lAs', 'ao1', 'ao2', 'var', 'const'])
+
+
+dict_lex = {lex.do: ["do", "begin of the loop body"],
+            lex.loop : ["loop", "end of the loop body"],
+           lex.until: ["until", "begin of condition statement"],
+           lex.lNot: ["not", "logical not"],
+           lex.lAnd: ["and", "logical and"],
+           lex.lOr: ["or", "logical or"],
+           lex.output: ["output", "output on screen"],
+           lex.rel: ["rel", "relation operation"],
+           lex.lAs: ["as", "assign"],
+           lex.ao1: ["ao1", "arithmetic operation priority 1"],
+           lex.ao2: ["ao2", "arithmetic operation priority 2"],
+           lex.var: ["var", "variable"],
+           lex.const: ["const", "constant"]}
 
 
 class Lex:
@@ -91,13 +106,17 @@ def add_lex(state, string, block):
 
     if state == states.Cs:
         if prev_state == lex.var or prev_state == lex.const:
-            list_lex.append(Lex(lex.ao, tmp))
-            return True
+            if string in ['+', '-']:
+                list_lex.append(Lex(lex.ao2, tmp))
+                return True
+            if string in ['*', '/']:
+                list_lex.append(Lex(lex.ao1, tmp))
+                return True
         return False
 
     if state == states.Ai or state == states.Ac:
         if block == 0:
-            if prev_state in [lex.lAs, lex.output, lex.do, lex.ao]:
+            if prev_state in [lex.lAs, lex.output, lex.do, lex.ao1, lex.ao2]:
                 if state == states.Ai:
                     list_lex.append(Lex(lex.var, tmp))
                 if state == states.Ac:
@@ -265,12 +284,21 @@ def lex_analysis(text):
     return True
 
 
+def print_table():
+    print(f"{'value of lex':^13} | {'type of lex':^13} | {'definition of lex':^40}")
+    print("-" * 72)
+    for x in list_lex:
+        print(f"{x.value:<13} | {dict_lex[x.type][0]:<13} | {dict_lex[x.type][1]:<40}")
+
+
 if __name__ == "__main__":
     text = input("Enter the text: \n")
     text = text.strip()
     if lex_analysis(text + " "):
         print("Text is a part of the program\n")
-        for x in list_lex:
-            print(x.value, x.type)
+        print_table()
     else:
         print("Text is NOT a part of the program")
+
+
+# do s = s * b + 10 output s loop until s < 100 or s <> b
