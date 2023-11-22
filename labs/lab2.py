@@ -80,7 +80,7 @@ class SyntaxAnalyzer:
         return True
 
     def log_expr(self):
-        if self.lexemes[self.pos].type == lex.lNot or self.lexemes[self.pos].type == lex.lAnd:
+        if self.pos < len(self.lexemes) and (self.lexemes[self.pos].type == lex.lNot or self.lexemes[self.pos].type == lex.lAnd):
             self.pos += 1
 
         if not self.rel_expr():
