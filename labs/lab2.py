@@ -1,5 +1,5 @@
-from lab1 import lex_analysis, add_lex, Lex, states, lex, dict_lex, print_table, list_lex
-from enum import Enum
+from lab1 import lex
+from lab3 import e_cmd, EEntry_type, Entry
 
 
 class SyntaxAnalyzer:
@@ -7,19 +7,25 @@ class SyntaxAnalyzer:
         self.lexemes = lexemes
         self.errors = []
         self.pos = 0
+        self.entries_list = []
 
     def start(self):
         self.pos = 0
         self.errors = []
+        self.entries_list = []
 
-        return self.until_statement()
+        result = self.until_statement()
+
+        if result:
+            return True, self.entries_list
+        return False, self.entries_list
 
     def get_errors(self):
         return self.errors
 
     def until_statement(self):
         # print(self.lexemes[self.pos].value, self.lexemes[self.pos].type, self.pos)
-
+        idx_first = len(self.entries_list)
         if self.lexemes[self.pos].type != lex.do:
             error = {
                 'error_msg': 'Expected keyword do',
@@ -30,6 +36,7 @@ class SyntaxAnalyzer:
             return False
 
         self.pos += 1
+
         if not self.statement():
             return False
 
@@ -66,6 +73,10 @@ class SyntaxAnalyzer:
         if not self.condition():
             return False
 
+        self.write_cmd(e_cmd.NOT)
+        self.write_cmd_ptr(idx_first)
+        self.write_cmd(e_cmd.JZ)
+
         return True
 
     def condition(self):
@@ -77,10 +88,16 @@ class SyntaxAnalyzer:
             if not self.log_expr():
                 return False
 
+            self.write_cmd(e_cmd.OR)
+
         return True
 
     def log_expr(self):
-        if self.pos < len(self.lexemes) and (self.lexemes[self.pos].type == lex.lNot or self.lexemes[self.pos].type == lex.lAnd):
+        if self.lexemes[self.pos].type == lex.lNot or self.lexemes[self.pos].type == lex.lAnd:
+            if self.lexemes[self.pos].type == lex.lNot:
+                self.write_cmd(e_cmd.NOT)
+            else:
+                self.write_cmd(e_cmd.AND)
             self.pos += 1
 
         if not self.rel_expr():
@@ -93,9 +110,20 @@ class SyntaxAnalyzer:
             return False
         if self.lexemes[self.pos].type == lex.rel:
             # print(self.lexemes[self.pos].value, self.lexemes[self.pos].type, self.pos)
+            cmd = None
+            if self.lexemes[self.pos].value == "<":
+                cmd = e_cmd.CMPL
+            elif self.lexemes[self.pos].value == ">":
+                cmd = e_cmd.CMPG
+            elif self.lexemes[self.pos].value == "<>":
+                cmd = e_cmd.CMPNE
+            elif self.lexemes[self.pos].value == "==":
+                cmd = e_cmd.CMPE
             self.pos += 1
             if not self.arith_expr():
                 return False
+
+            self.write_cmd(cmd)
 
         return True
 
@@ -110,12 +138,17 @@ class SyntaxAnalyzer:
             print(f'{error["error_msg"]} {error["pos"]}')
             self.errors.append(error)
             return False
+        if self.lexemes[self.pos].type == lex.var:
+            self.write_var(self.pos)
+        elif self.lexemes[self.pos].type == lex.const:
+            self.write_const(self.pos)
         self.pos += 1
         return True
 
     def statement(self):
         # print(self.lexemes[self.pos].value, self.lexemes[self.pos].type, self.pos)
         if self.lexemes[self.pos].type == lex.var:
+            self.write_var(self.pos)
             self.pos += 1
 
             # print(self.lexemes[self.pos].value, self.lexemes[self.pos].type, self.pos)
@@ -132,12 +165,15 @@ class SyntaxAnalyzer:
             self.pos += 1
             if not self.arith_expr():
                 return False
+
+            self.write_cmd(e_cmd.SET)
             return True
 
         elif self.lexemes[self.pos].type == lex.output:
             self.pos += 1
             if not self.operand():
                 return False
+            self.write_cmd(e_cmd.OUTPUT)
             return True
         else:
             error = {
@@ -153,28 +189,61 @@ class SyntaxAnalyzer:
             return False
         while self.pos < len(self.lexemes) and (self.lexemes[self.pos].type == lex.ao1 or self.lexemes[self.pos].type == lex.ao2):
             # print(self.lexemes[self.pos].value, self.lexemes[self.pos].type, self.pos)
+            cmd = None
+            if self.lexemes[self.pos].value == '+':
+                cmd = e_cmd.ADD
+            elif self.lexemes[self.pos].value == '-':
+                cmd = e_cmd.SUB
+            elif self.lexemes[self.pos].value == '/':
+                cmd = e_cmd.DIV
+            elif self.lexemes[self.pos].value == '*':
+                cmd = e_cmd.MUL
+
             self.pos += 1
             if not self.operand():
                 return False
 
+            self.write_cmd(cmd)
+
         return True
 
+    def write_cmd(self, cmd: e_cmd):
+        command = Entry(entry_type=EEntry_type.CMD,
+                        cmd=cmd,
+                        index=len(self.entries_list))
 
-if __name__ == "__main__":
-    text = input("Enter the text: \n")
-    text = text.strip()
-    if lex_analysis(text + " "):
-        print_table()
-        syn_an = SyntaxAnalyzer(list_lex)
-        if syn_an.start():
-            print("Text is a part of the program\n")
-        else:
-            print("Text is NOT a part of the program")
+        self.entries_list.append(command)
 
-    else:
-        print_table()
-        print("Text is NOT a part of the program")
+        return len(self.entries_list) - 1
+
+    def write_var(self, idx: int):
+        variable = Entry(entry_type=EEntry_type.VAR,
+                         value=self.lexemes[idx].value,
+                         index=len(self.entries_list))
+
+        self.entries_list.append(variable)
+
+        return len(self.entries_list) - 1
+
+    def write_const(self, idx: int):
+        constant = Entry(entry_type=EEntry_type.CONST,
+                         value=self.lexemes[idx].value,
+                         index=len(self.entries_list))
+
+        self.entries_list.append(constant)
+
+        return len(self.entries_list) - 1
+
+    def write_cmd_ptr(self, ptr):
+        cmd_ptr = Entry(entry_type=EEntry_type.CMD_PTR,
+                        cmd_ptr=ptr,
+                        index=len(self.entries_list))
+
+        self.entries_list.append(cmd_ptr)
+
+        return len(self.entries_list) - 1
+
+    def set_cmd_ptr(self, idx: int, ptr: int):
+        self.entries_list[idx].cmd_ptr = ptr
 
 
-# do s = s * b + 10 output s loop until s < 100 or s <> b
-# do s = p loop s < 100 or s <> b
